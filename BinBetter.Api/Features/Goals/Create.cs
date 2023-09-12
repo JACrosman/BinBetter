@@ -16,9 +16,9 @@ namespace BinBetter.Api.Features.Goals
             public int Frequency { get; set; }
         }
 
-        public record Command(GoalData Goal) : IRequest<GoalModelEnvelope>;
+        public record Command(GoalData Goal) : IRequest<GoalEnvelope>;
 
-        public class Handler : IRequestHandler<Command, GoalModelEnvelope>
+        public class Handler : IRequestHandler<Command, GoalEnvelope>
         {
             private readonly IBinBetterRepository _repository;
             private readonly ICurrentUserAccessor _currentUserAccessor;
@@ -29,7 +29,7 @@ namespace BinBetter.Api.Features.Goals
                 _currentUserAccessor = currentUserAccessor;
             }
 
-            public async Task<GoalModelEnvelope> Handle(Command message, CancellationToken cancellationToken)
+            public async Task<GoalEnvelope> Handle(Command message, CancellationToken cancellationToken)
             {
                 var bin = await _repository.Bins.FindByUserIdAsync(_currentUserAccessor.GetCurrentUserId());
 
@@ -44,14 +44,7 @@ namespace BinBetter.Api.Features.Goals
                 _repository.Goals.Add(goal);
                 await _repository.SaveAsync();
 
-                return new GoalModelEnvelope(new GoalModel
-                {
-                    GoalId = goal.GoalId,
-                    Name = goal.Name,
-                    Description = goal.Description,
-                    Frequency = goal.Frequency,
-                    BinId =  goal.BinId
-                });
+                return new GoalEnvelope(goal);
             }
         }
     }

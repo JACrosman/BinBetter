@@ -29,7 +29,6 @@ namespace BinBetter.Api.Features.Goals
                     throw new RestException(HttpStatusCode.NotFound, new { Goal = ErrorConstants.NOT_FOUND });
                 }
 
-
                 _repository.Goals.Delete(goal);
                 await _repository.SaveAsync();
 

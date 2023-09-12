@@ -6,12 +6,12 @@ using Moq;
 
 namespace BinBetter.Test.Features.Goals
 {
-    public class GoalsCreateTests
+    public class GoalsUpdateTests
     {
         private readonly Mock<IBinBetterRepository> _mockRepo;
         private readonly Mock<ICurrentUserAccessor> _mockCurrentUserAccessor;
 
-        public GoalsCreateTests()
+        public GoalsUpdateTests()
         {
             _mockRepo = MockBinBetterRepository.Get();
             _mockCurrentUserAccessor = MockCurrentUserAccessor.Get();
@@ -35,7 +35,6 @@ namespace BinBetter.Test.Features.Goals
 
             Assert.NotNull(result);
             Assert.Equal(3, goals.Count());
-
         }
     }
 }

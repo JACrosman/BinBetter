@@ -26,17 +26,14 @@ namespace BinBetter.Test.Mocks
             };
 
             var mockRepo = new Mock<IGoalsRepository>();
-
             var mockGoals = goals.AsQueryable().BuildMock();
 
-            mockRepo.Setup(r => r.ListAsync()).ReturnsAsync(() => goals);
+            mockRepo.Setup(r => r.ListAsync()).ReturnsAsync(goals);
             mockRepo.Setup(r => r.QueryableAsync()).Returns(mockGoals);
             mockRepo.Setup(r => r.FindByIdAsync(It.IsAny<int>(), CancellationToken.None)).ReturnsAsync((int id, CancellationToken c) => goals.AsEnumerable().FirstOrDefault(x => x.GoalId == id));
-
-            mockRepo.Setup(r => r.Add(It.IsAny<Goal>())).Callback((Goal goal) =>
-            {
-                goals.Add(goal);
-            });
+            mockRepo.Setup(r => r.Add(It.IsAny<Goal>())).Callback((Goal goal) => goals.Add(goal));
+            mockRepo.Setup(r => r.Update(It.IsAny<Goal>())).Callback((Goal goal) => { return; });
+            mockRepo.Setup(r => r.Delete(It.IsAny<Goal>())).Callback((Goal goal) => goals.Remove(goal));
 
             return mockRepo;
         }

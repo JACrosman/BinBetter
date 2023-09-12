@@ -4,7 +4,7 @@ namespace BinBetter.Api.Data.Repositories
 {
     public interface IUserRepository : IRepository<User>
     {
-        IQueryable<User> FindByUsername(String username);
-        IQueryable<User> FindByEmail(String email);
+        Task<User?> FindByUsernameAsync(String username);
+        Task<User?> FindByEmailAsync(String email);
     }
 }

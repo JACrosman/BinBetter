@@ -19,28 +19,28 @@ namespace BinBetter.Api.Controllers
 
         [HttpGet]
         [Authorize]
-        public Task<List<Goal>> Get()
+        public Task<GoalListEnvelope> Get()
         {
             return _sender.Send(new Get.Query());
         }
 
         [HttpGet("{id}")]
         [Authorize]
-        public Task<GoalModelEnvelope> Get(int id)
+        public Task<GoalEnvelope> Get(int id)
         {
             return _sender.Send(new GetById.Query(id));
         }
 
         [HttpPost]
         [Authorize]
-        public Task<GoalModelEnvelope> Create([FromBody] Create.Command command)
+        public Task<GoalEnvelope> Create([FromBody] Create.Command command)
         {
             return _sender.Send(command);
         }
 
         [HttpPut("{id}")]
         [Authorize]
-        public Task<GoalModelEnvelope> Update(int id, [FromBody] Update.Model model)
+        public Task<GoalEnvelope> Update(int id, [FromBody] Update.Model model)
         {
             return _sender.Send(new Update.Command(id, model));
         }

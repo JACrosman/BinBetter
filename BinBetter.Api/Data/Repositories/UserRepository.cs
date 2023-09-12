@@ -15,14 +15,14 @@ namespace BinBetter.Api.Data.Repositories
             return base.QueryableAsync().AsNoTracking();
         }
 
-        public IQueryable<User> FindByUsername(string username)
+        public Task<User?> FindByUsernameAsync(string username)
         {
-            return _context.Users.Where(u => u.Username != null && u.Username.Equals(username));
+            return _context.Users.FirstOrDefaultAsync(u => u.Username != null && u.Username.Equals(username));
         }
 
-        public IQueryable<User> FindByEmail(string email)
+        public Task<User?> FindByEmailAsync(string email)
         {
-            return _context.Users.Where(u => u.Email != null && u.Email.Equals(email));
+            return _context.Users.FirstOrDefaultAsync(u => u.Email != null && u.Email.Equals(email));
         }
     }
 }

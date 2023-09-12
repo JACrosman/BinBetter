@@ -1,7 +1,5 @@
 ﻿using BinBetter.Api.Data;
 using BinBetter.Api.Data.Domain;
-using BinBetter.Api.Data.Repositories;
-using BinBetter.Api.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,26 +7,25 @@ namespace BinBetter.Api.Features.Goals
 {
     public class Get
     {
-        public record Query(): IRequest<List<Goal>>;
+        public record Query() : IRequest<GoalListEnvelope>;
 
-        public class QueryHandler : IRequestHandler<Query, List<Goal>>
+        public class QueryHandler : IRequestHandler<Query, GoalListEnvelope>
         {
             private readonly IBinBetterRepository _repository;
-            private readonly ICurrentUserAccessor _currentUserAccessor;
 
-            public QueryHandler(IBinBetterRepository repository, ICurrentUserAccessor currentUserAccessor)
+            public QueryHandler(IBinBetterRepository repository)
             {
                 _repository = repository;
-                _currentUserAccessor = currentUserAccessor;
             }
 
-            public async Task<List<Goal>> Handle(Query message, CancellationToken cancellation)
+            public async Task<GoalListEnvelope> Handle(Query message, CancellationToken cancellation)
             {
                 IQueryable<Goal> goalQuery = _repository.Goals.QueryableAsync();
 
                 var goals = await goalQuery.ToListAsync();
 
-                return goals;
+                return new GoalListEnvelope { Goals = goals, GoalsCount = goals.Count() };
+
             }
         }
     }

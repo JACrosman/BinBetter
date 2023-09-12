@@ -7,9 +7,9 @@ namespace BinBetter.Api.Features.Goals
 {
     public class GetById
     {
-        public record Query(int Id) : IRequest<GoalModelEnvelope>;
+        public record Query(int Id) : IRequest<GoalEnvelope>;
 
-        public class QueryHandler : IRequestHandler<Query, GoalModelEnvelope>
+        public class QueryHandler : IRequestHandler<Query, GoalEnvelope>
         {
             private readonly IBinBetterRepository _repository;
 
@@ -18,7 +18,7 @@ namespace BinBetter.Api.Features.Goals
                 _repository = repository;
             }
 
-            public async Task<GoalModelEnvelope> Handle(Query message, CancellationToken cancellationToken)
+            public async Task<GoalEnvelope> Handle(Query message, CancellationToken cancellationToken)
             {
                 var goal = await _repository.Goals.FindByIdAsync(message.Id, cancellationToken);
 
@@ -27,14 +27,7 @@ namespace BinBetter.Api.Features.Goals
                     throw new RestException(HttpStatusCode.NotFound, new { Goal = ErrorConstants.NOT_FOUND });
                 }
 
-                return new GoalModelEnvelope(new GoalModel
-                {
-                    GoalId = goal.GoalId,
-                    BinId = goal.BinId,
-                    Name = goal.Name,
-                    Description = goal.Description,
-                    Frequency = goal.Frequency
-                });
+                return new GoalEnvelope(goal);
             }
         }
     }

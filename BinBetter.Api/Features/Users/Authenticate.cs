@@ -28,7 +28,7 @@ namespace BinBetter.Api.Features.Users
 
             public async Task<UserModel> Handle(Command command, CancellationToken cancellation)
             {
-                var user = await _repository.Users.FindByUsername(command.Username).FirstOrDefaultAsync();
+                var user = await _repository.Users.FindByUsernameAsync(command.Username);
 
                 // Validate user exists
                 if (user == null)

@@ -1,9 +1,10 @@
-﻿using BinBetter.Api.Data;
+﻿using AutoMapper;
+using BinBetter.Api.Data;
 using BinBetter.Api.Data.Domain;
 using BinBetter.Api.Errors;
 using BinBetter.Api.Security;
+using FluentValidation;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
 
 namespace BinBetter.Api.Features.Users
@@ -19,23 +20,43 @@ namespace BinBetter.Api.Features.Users
             public string? Password { get; set; }
         }
 
+        public class UserDataValidator : AbstractValidator<UserData>
+        {
+            public UserDataValidator()
+            {
+                RuleFor(x => x.Username).NotNull().NotEmpty();
+                RuleFor(x => x.Email).NotNull().NotEmpty().EmailAddress();
+                RuleFor(x => x.Password).NotNull().NotEmpty().MinimumLength(6);
+            }
+        }
+
         public record Command(UserData User) : IRequest<UserModelEnvelope>;
+
+        public class CommandValidator : AbstractValidator<Command>
+        {
+            public CommandValidator()
+            {
+                RuleFor(x => x.User).NotNull().SetValidator(new UserDataValidator());
+            }
+        }
 
         public class Handler : IRequestHandler<Command, UserModelEnvelope>
         {
             private readonly IBinBetterRepository _repository;
             private readonly IPasswordHasher _passwordHasher;
+            private readonly IMapper _mapper;
 
-            public Handler(IBinBetterRepository repository, IPasswordHasher passwordHasher)
+            public Handler(IBinBetterRepository repository, IPasswordHasher passwordHasher, IMapper mapper)
             {
                 _repository = repository;
                 _passwordHasher = passwordHasher;
+                _mapper = mapper;
             }
 
             public async Task<UserModelEnvelope> Handle(Command message, CancellationToken cancellationToken)
             {
                 // Check for already existing name
-                if (await _repository.Users.FindByUsername(message.User.Username).AnyAsync(cancellationToken))
+                if (await _repository.Users.FindByUsernameAsync(message.User.Username) != null)
                 {
                     throw new RestException(
                         HttpStatusCode.BadRequest,
@@ -44,7 +65,7 @@ namespace BinBetter.Api.Features.Users
                 }
 
                 // Check for already existing Email
-                if (await _repository.Users.FindByEmail(message.User.Email).AnyAsync(cancellationToken))
+                if (await _repository.Users.FindByEmailAsync(message.User.Email) != null)
                 {
                     throw new RestException(
                         HttpStatusCode.BadRequest,
@@ -69,13 +90,7 @@ namespace BinBetter.Api.Features.Users
                 _repository.Users.Add(user);
                 await _repository.SaveAsync();
 
-                UserModel userModel = new UserModel
-                {
-                    Username = user.Username,
-                    Email = user.Email
-                };
-
-                return new UserModelEnvelope(userModel);
+                return new UserModelEnvelope(_mapper.Map<User, UserModel>(user));
             }
         }
     }

@@ -51,6 +51,6 @@ MIT
 
 ---
 
-> [joshuacrosman.com](https://joshuacrosman.com) &nbsp;&middot;&nbsp;
+> [joshuacrosman.com](https://joshua-crosman.com) &nbsp;&middot;&nbsp;
 > GitHub [@JACrosman](https://github.com/JACrosman)
 

@@ -10,9 +10,9 @@ namespace BinBetter.Api.Data.Repositories
         {
         }
 
-        public override IQueryable<Goal> AsQueryable()
+        public override IQueryable<Goal> QueryableAsync()
         {
-            return base.AsQueryable().AsNoTracking();
+            return base.QueryableAsync().AsNoTracking();
         }
     }
 }

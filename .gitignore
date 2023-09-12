@@ -283,3 +283,6 @@ tools
 .env
 
 .DS_Store
+
+# Angular
+.angular

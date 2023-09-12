@@ -1,8 +1,6 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BinBetter.Api.Data.Domain
+﻿namespace BinBetter.Api.Features.Goals
 {
-    public class Goal
+    public class GoalModel
     {
         public int GoalId { get; set; }
 
@@ -17,8 +15,7 @@ namespace BinBetter.Api.Data.Domain
         public int Frequency { get; set; }
 
         public bool IsInBin { get; set; }
-
-        [JsonIgnore]
-        public Bin? Bin{ get; set; }
     }
+
+    public record GoalModelEnvelope(GoalModel Goal);
 }

@@ -23,11 +23,11 @@ namespace BinBetter.Api.Migrations
 
             modelBuilder.Entity("BinBetter.Api.Data.Domain.Bin", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("BinId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BinId"));
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -35,26 +35,32 @@ namespace BinBetter.Api.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("BinId");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Bins");
 
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            BinId = 1,
                             Description = "My first Bin",
-                            Name = "Bin 1"
+                            Name = "Bin 1",
+                            UserId = 1
                         });
                 });
 
             modelBuilder.Entity("BinBetter.Api.Data.Domain.Goal", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("GoalId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GoalId"));
 
                     b.Property<int>("BinId")
                         .HasColumnType("int");
@@ -74,7 +80,7 @@ namespace BinBetter.Api.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("Id");
+                    b.HasKey("GoalId");
 
                     b.HasIndex("BinId");
 
@@ -83,7 +89,7 @@ namespace BinBetter.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            GoalId = 1,
                             BinId = 1,
                             Description = "My first goal",
                             Frequency = 0,
@@ -93,7 +99,7 @@ namespace BinBetter.Api.Migrations
                         },
                         new
                         {
-                            Id = 2,
+                            GoalId = 2,
                             BinId = 1,
                             Description = "My second goal",
                             Frequency = 0,
@@ -103,7 +109,7 @@ namespace BinBetter.Api.Migrations
                         },
                         new
                         {
-                            Id = 3,
+                            GoalId = 3,
                             BinId = 1,
                             Description = "My third goal",
                             Frequency = 0,
@@ -111,6 +117,54 @@ namespace BinBetter.Api.Migrations
                             Name = "Goal 3",
                             Quantity = 0
                         });
+                });
+
+            modelBuilder.Entity("BinBetter.Api.Data.Domain.User", b =>
+                {
+                    b.Property<int>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("Hash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Username")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = 1,
+                            Email = "Fenki@fenki.com",
+                            Hash = new byte[] { 118, 137, 66, 175, 220, 34, 206, 219, 70, 79, 103, 58, 78, 107, 11, 82, 57, 29, 158, 109, 166, 217, 209, 230, 184, 103, 216, 199, 66, 73, 179, 54, 50, 46, 84, 107, 152, 172, 138, 70, 29, 157, 203, 48, 227, 57, 240, 175, 64, 175, 64, 124, 137, 4, 99, 120, 241, 18, 104, 78, 161, 101, 247, 160 },
+                            Salt = new byte[] { 46, 232, 138, 5, 176, 86, 155, 64, 156, 146, 35, 108, 213, 250, 153, 66 },
+                            Username = "Fenki"
+                        });
+                });
+
+            modelBuilder.Entity("BinBetter.Api.Data.Domain.Bin", b =>
+                {
+                    b.HasOne("BinBetter.Api.Data.Domain.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BinBetter.Api.Data.Domain.Goal", b =>

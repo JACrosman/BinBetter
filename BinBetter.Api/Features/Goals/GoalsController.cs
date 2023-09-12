@@ -1,6 +1,7 @@
 ﻿using BinBetter.Api.Data.Domain;
 using BinBetter.Api.Features.Goals;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BinBetter.Api.Controllers
@@ -17,9 +18,38 @@ namespace BinBetter.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public Task<List<Goal>> Get()
         {
             return _sender.Send(new Get.Query());
+        }
+
+        [HttpGet("{id}")]
+        [Authorize]
+        public Task<GoalModelEnvelope> Get(int id)
+        {
+            return _sender.Send(new GetById.Query(id));
+        }
+
+        [HttpPost]
+        [Authorize]
+        public Task<GoalModelEnvelope> Create([FromBody] Create.Command command)
+        {
+            return _sender.Send(command);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public Task<GoalModelEnvelope> Update(int id, [FromBody] Update.Model model)
+        {
+            return _sender.Send(new Update.Command(id, model));
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public Task Delete(int id)
+        {
+            return _sender.Send(new Delete.Command(id));
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BinBetter.Api.Data;
 using BinBetter.Api.Data.Domain;
 using BinBetter.Api.Data.Repositories;
+using BinBetter.Api.Security;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,28 +13,23 @@ namespace BinBetter.Api.Features.Goals
 
         public class QueryHandler : IRequestHandler<Query, List<Goal>>
         {
-            private readonly IGoalsRepository _goalsRepository;
+            private readonly IBinBetterRepository _repository;
+            private readonly ICurrentUserAccessor _currentUserAccessor;
 
-            public QueryHandler(IGoalsRepository goalsRepository)
+            public QueryHandler(IBinBetterRepository repository, ICurrentUserAccessor currentUserAccessor)
             {
-                _goalsRepository = goalsRepository;
+                _repository = repository;
+                _currentUserAccessor = currentUserAccessor;
             }
 
-            /// <summary>
-            /// Get all goals based on query message
-            /// </summary>
-            /// <param name="message">query message params</param>
-            /// <param name="cancellation">cancellation token</param>
-            /// <returns>List of goals</returns>
             public async Task<List<Goal>> Handle(Query message, CancellationToken cancellation)
             {
-                IQueryable<Goal> goalQuery = _goalsRepository.AsQueryable();
+                IQueryable<Goal> goalQuery = _repository.Goals.QueryableAsync();
 
                 var goals = await goalQuery.ToListAsync();
 
                 return goals;
             }
         }
-
     }
 }

@@ -16,19 +16,19 @@ namespace BinBetter.Api.Data.Repositories
             return await _context.Set<T>().AsNoTracking().ToListAsync();
         }
 
-        public virtual IQueryable<T> AsQueryable()
+        public virtual IQueryable<T> QueryableAsync()
         {
             return _context.Set<T>().AsNoTracking().AsQueryable();
         }
 
-        public virtual async Task<T> FindByIdAsync(int id)
+        public virtual async Task<T?> FindByIdAsync(int id, CancellationToken cancellationToken)
         {
-            return await _context.Set<T>().FindAsync(id);
+            return await _context.Set<T>().FindAsync(id, cancellationToken);
         }
 
-        public virtual async Task AddAsync(T entity)
+        public virtual void Add(T entity)
         {
-            await _context.Set<T>().AddAsync(entity);
+            _context.Set<T>().Add(entity);
         }
 
         public virtual void Update(T entity)

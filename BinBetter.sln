@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34024.191
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinBetter.Api", "BinBetter.Api\BinBetter.Api.csproj", "{F8AF34B2-F2AC-4ECD-8796-2236C5824730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BinBetter.Api", "BinBetter.Api\BinBetter.Api.csproj", "{F8AF34B2-F2AC-4ECD-8796-2236C5824730}"
 EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "BinBetter.Client", "BinBetter.Client\BinBetter.Client.esproj", "{C4803EC9-7B6D-414A-9974-76CF91C2DE23}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BinBetter.Test", "BinBetter.Test\BinBetter.Test.csproj", "{D2D7EF3C-B1CA-4CC0-B501-386195E57026}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,6 +25,10 @@ Global
 		{C4803EC9-7B6D-414A-9974-76CF91C2DE23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4803EC9-7B6D-414A-9974-76CF91C2DE23}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C4803EC9-7B6D-414A-9974-76CF91C2DE23}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{D2D7EF3C-B1CA-4CC0-B501-386195E57026}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2D7EF3C-B1CA-4CC0-B501-386195E57026}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2D7EF3C-B1CA-4CC0-B501-386195E57026}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2D7EF3C-B1CA-4CC0-B501-386195E57026}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,7 +1,7 @@
 using BinBetter.Api.Data;
 using BinBetter.Api.Data.Repositories;
+using BinBetter.Api.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
@@ -16,10 +16,44 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 // Mediatr
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
+// Authentication
+var issuer = builder.Configuration["Jwt:Issuer"];
+var audience = builder.Configuration["Jwt:Issuer"];
+var signingKey = new SymmetricSecurityKey(
+    Encoding.ASCII.GetBytes(builder.Configuration["Jwt:Key"])
+);
+var signingCredentials = new SigningCredentials(
+    signingKey,
+    SecurityAlgorithms.HmacSha256
+);
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
+builder.Services.AddScoped<ICurrentUserAccessor, CurrentUserAccessor>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.Configure<JwtIssuerOptions>(options =>
+{
+    options.Issuer = issuer;
+    options.Audience = audience;
+    options.SigningCredentials = signingCredentials;
+});
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = issuer,
+            ValidateAudience = true,
+            ValidAudience = audience,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ValidateLifetime = true
+        };
+    }
+);
 
 // Database
 builder.Services.AddDbContext<BinBetterContext>(options =>
@@ -29,21 +63,24 @@ builder.Services.AddDbContext<BinBetterContext>(options =>
 
 // Repositories
 builder.Services.AddScoped<IGoalsRepository, GoalsRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBinBetterRepository, BinBetterRepository>();
 
-
-// Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
+// Mvc
+builder.Services
+    .AddMvc(opt =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    });
-
+        opt.EnableEndpointRouting = false;
+    })
+    .AddJsonOptions(
+        opt =>
+            opt.JsonSerializerOptions.DefaultIgnoreCondition = System
+                .Text
+                .Json
+                .Serialization
+                .JsonIgnoreCondition
+                .WhenWritingNull
+    );
 
 var app = builder.Build();
 
@@ -53,6 +90,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 
 app.UseHttpsRedirection();
 

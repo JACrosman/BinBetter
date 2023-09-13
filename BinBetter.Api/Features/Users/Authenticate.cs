@@ -1,4 +1,6 @@
-﻿using BinBetter.Api.Data;
+﻿using AutoMapper;
+using BinBetter.Api.Data;
+using BinBetter.Api.Data.Domain;
 using BinBetter.Api.Data.Repositories;
 using BinBetter.Api.Errors;
 using BinBetter.Api.Security;
@@ -10,25 +12,27 @@ namespace BinBetter.Api.Features.Users
 {
     public class Authenticate
     {
-        public record Command(string Username, string Password) : IRequest<UserModel>;
+        public record Command(string Email, string Password) : IRequest<UserModelEnvelope>;
 
-        public class CommandHandler : IRequestHandler<Command, UserModel>
+        public class CommandHandler : IRequestHandler<Command, UserModelEnvelope>
         {
 
             private readonly IBinBetterRepository _repository;
             private readonly IJwtTokenGenerator _jwtTokenGenerator;
             private readonly IPasswordHasher _passwordHasher;
+            private readonly IMapper _mapper;
 
-            public CommandHandler(IBinBetterRepository repository, IJwtTokenGenerator jwtTokenGenerator, IPasswordHasher passwordHasher)
+            public CommandHandler(IBinBetterRepository repository, IJwtTokenGenerator jwtTokenGenerator, IPasswordHasher passwordHasher, IMapper mapper)
             {
                 _repository = repository;
                 _jwtTokenGenerator = jwtTokenGenerator;
                 _passwordHasher = passwordHasher;
+                _mapper = mapper;
             }
 
-            public async Task<UserModel> Handle(Command command, CancellationToken cancellation)
+            public async Task<UserModelEnvelope> Handle(Command command, CancellationToken cancellation)
             {
-                var user = await _repository.Users.FindByUsernameAsync(command.Username);
+                var user = await _repository.Users.FindByEmailAsync(command.Email);
 
                 // Validate user exists
                 if (user == null)
@@ -46,17 +50,13 @@ namespace BinBetter.Api.Features.Users
                    );
                 }
 
-                var token = _jwtTokenGenerator.CreateToken(
+                var userModel = _mapper.Map<User, UserModel>(user);
+                userModel.Token = _jwtTokenGenerator.CreateToken(
                     user.Username ?? throw new InvalidOperationException(),
                     user.UserId
                 );
-                UserModel userModel = new UserModel
-                {
-                    Username = command.Username,
-                    Token = token
-                };
 
-                return userModel;
+                return new UserModelEnvelope(userModel);
             }
         }
     }

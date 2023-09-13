@@ -19,9 +19,9 @@ namespace BinBetter.Api.Features.Users
 
         [HttpPost("authenticate")]
         [AllowAnonymous]
-        public async Task<IActionResult> Authenticate([FromBody]UserModel userModel)
+        public async Task<IActionResult> Authenticate([FromBody] Authenticate.Command command)
         {
-            var user = await _sender.Send(new Authenticate.Command(userModel.Username, userModel.Password));
+            var user = await _sender.Send(command);
 
             if (user == null)
             {
